@@ -1,0 +1,8 @@
+{
+  "genre": "Ciencia ficción",
+  "length": "short",
+  "style": "Descriptivo",
+  "themes_to_include": ["Exploración espacial", "Inteligencia artificial"],
+  "themes_to_avoid": ["Violencia gráfica"],
+  "art_style": "Futurista"
+}

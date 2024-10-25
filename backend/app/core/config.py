@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    project_name: str = "Storyteller API"
     mongodb_url: str = "mongodb://localhost:27017"
     database_name: str = "storyteller"
     openai_api_key: str = ""

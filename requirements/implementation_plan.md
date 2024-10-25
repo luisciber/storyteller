@@ -20,9 +20,9 @@
 
 [ ] 2.3. Implementar la autenticación y autorización
 
-[ ] 2.4. Crear endpoints para la generación de historias
+[x] 2.4. Crear endpoints para la generación de historias
 
-[ ] 2.5. Integrar Langchain y LangGraph para el orquestamiento de workflows
+[x] 2.5. Integrar Langchain y LangGraph para el orquestamiento de workflows
 
 [ ] 2.6. Implementar la lógica para la generación de imágenes con DALL-E 3
 
@@ -48,11 +48,11 @@
 
 ## 4. Integración de IA y Flujos de Trabajo
 
-[ ] 4.1. Configurar la integración con la API de Claude (Anthropic)
+[x] 4.1. Configurar la integración con la API de Claude (Anthropic)
 
-[ ] 4.2. Configurar la integración con la API de GPT-4 (OpenAI)
+[x] 4.2. Configurar la integración con la API de GPT-4 (OpenAI)
 
-[ ] 4.3. Implementar el flujo de trabajo para la generación de historias usando Langchain
+[x] 4.3. Implementar el flujo de trabajo para la generación de historias usando Langchain
 
 [ ] 4.4. Crear el flujo de trabajo para la generación de imágenes con DALL-E 3
 
@@ -60,7 +60,7 @@
 
 ## 5. Implementación de Tareas en Segundo Plano
 
-[ ] 5.1. Configurar Celery con MongoDB como broker
+[ ] 5.1. Configurar Celery con Redis como broker
 
 [ ] 5.2. Implementar tareas en segundo plano para la generación de historias
 
