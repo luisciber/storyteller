@@ -3,7 +3,6 @@ from operator import add
 from typing import Annotated, Optional
 
 from langchain.prompts import ChatPromptTemplate
-from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
@@ -57,11 +56,6 @@ class UserPreferences(BaseModel):
     )
 
 
-# Configuración del modelo de lenguaje
-claude_llm = ChatAnthropic(
-    model="claude-3-5-sonnet-latest", api_key=settings.anthropic_api_key
-)
-
 openai_llm = ChatOpenAI(
     model="gpt-4o", api_key=settings.openai_api_key
 )
@@ -80,7 +74,7 @@ class GraphState(TypedDict):
 
 def generate_outline(state: GraphState) -> GraphState:
     prompt = ChatPromptTemplate.from_template(STORY_OUTLINE_PROMPT)
-    chain = prompt | claude_llm.with_structured_output(StoryOutline)
+    chain = prompt | openai_llm.with_structured_output(StoryOutline)
     outline = chain.invoke(state['user_preferences'].model_dump())
     return {"outline": outline}
 
