@@ -23,6 +23,10 @@
 	function navigateToCreateStory() {
 		goto('/create-story');
 	}
+
+	function navigateToStory(id: string) {
+		goto(`/story/${id}`);
+	}
 </script>
 
 <main class="container mx-auto p-4">
@@ -51,7 +55,7 @@
 					<p class="h-full">{story.premise}</p>
 				</Card.Content>
 				<Card.Footer class="flex justify-end">
-					<Button>Ver Historia</Button>
+					<Button on:click={() => navigateToStory(story.id!)}>Ver Historia</Button>
 				</Card.Footer>
 			</Card.Root>
 		{/each}
