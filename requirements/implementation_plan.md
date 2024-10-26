@@ -80,21 +80,13 @@
 
 ## 7. Despliegue y Documentación
 
-[ ] 7.1. Preparar la aplicación para el despliegue (containerización con Docker)
+[x] 7.1. Preparar la aplicación para el despliegue (containerización con Docker)
 
-[ ] 7.2. Configurar un entorno de staging
+[x] 7.2. Configurar un entorno de staging
 
 [ ] 7.3. Documentar la API y los flujos de trabajo
 
 [ ] 7.4. Crear un manual de usuario básico
-
-## 8. Preparación para la Hackathon
-
-[ ] 8.1. Preparar una demostración del proyecto
-
-[ ] 8.2. Crear una presentación destacando las características clave y la innovación
-
-[ ] 8.3. Practicar la presentación y prepararse para preguntas potenciales
 
 ## Notas
 
