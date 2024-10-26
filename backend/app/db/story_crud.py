@@ -13,7 +13,7 @@ async def create_story(story: Story):
     story_dict = story.model_dump(by_alias=True, exclude={"id"})
     new_story = await story_collection.insert_one(story_dict)
     created_story = await story_collection.find_one({"_id": new_story.inserted_id})
-    return Story(**{**created_story, "_id": str(created_story["_id"])})
+    return Story(**{**created_story, "id": str(created_story["_id"])})
 
 
 async def get_stories():

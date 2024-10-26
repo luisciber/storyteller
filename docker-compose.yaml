@@ -28,6 +28,17 @@ services:
       - "9023:9023"
     volumes:
       - ./storage:/storage
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - redis
 
 volumes:
   mongodb-data:
