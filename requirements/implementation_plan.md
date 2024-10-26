@@ -24,7 +24,7 @@
 
 [x] 2.5. Integrar Langchain y LangGraph para el orquestamiento de workflows
 
-[ ] 2.6. Implementar la lógica para la generación de imágenes con DALL-E 3
+[x] 2.6. Implementar la lógica para la generación de imágenes
 
 [ ] 2.7. Desarrollar un sistema de tareas en segundo plano (usando Celery o FastAPI background tasks)
 
@@ -32,7 +32,7 @@
 
 ## 3. Desarrollo del Frontend (SvelteKit)
 
-[ ] 3.1. Configurar el proyecto SvelteKit con @shadcn-svelte
+[x] 3.1. Configurar el proyecto SvelteKit con @shadcn-svelte
 
 [ ] 3.2. Diseñar e implementar la interfaz de usuario principal
 
@@ -54,7 +54,7 @@
 
 [x] 4.3. Implementar el flujo de trabajo para la generación de historias usando Langchain
 
-[ ] 4.4. Crear el flujo de trabajo para la generación de imágenes con DALL-E 3
+[x] 4.4. Crear el flujo de trabajo para la generación de imágenes
 
 [ ] 4.5. Desarrollar la lógica para alternar entre diferentes modelos de IA según sea necesario
 
