@@ -150,7 +150,6 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
 
     # Generate image
     image_url = await generate_image(chapter_content.image_description)
-    print(image_url)
 
     return {"chapters": [
         Chapter(
@@ -158,7 +157,7 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
             title=state['outline'].chapter_titles[current_chapter],
             content=chapter_content.content,
             image_description=chapter_content.image_description,
-            image_url='',
+            image_url=image_url,
         )
     ], "current_chapter": current_chapter + 1}
 
