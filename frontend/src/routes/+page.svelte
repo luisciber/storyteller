@@ -36,11 +36,6 @@
 
 	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 		{#each stories as story}
-			<!-- <div class="rounded-lg border p-4 shadow">
-				<h2 class="mb-2 text-xl font-semibold">{story.title}</h2>
-				<p class="mb-2 text-gray-600">Género: {story.preferences.genre}</p>
-				<p class="mb-2 text-gray-600">Longitud: {story.preferences.length}</p>
-			</div> -->
 			<Card.Root class="flex flex-col">
 				<Card.Header>
 					<Card.Title>{story.title}</Card.Title>

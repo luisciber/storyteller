@@ -34,7 +34,7 @@
 
 [x] 3.1. Configurar el proyecto SvelteKit con @shadcn-svelte
 
-[ ] 3.2. Diseñar e implementar la interfaz de usuario principal
+[x] 3.2. Diseñar e implementar la interfaz de usuario principal
 
 [x] 3.3. Crear componentes para la entrada de preferencias del usuario
 
@@ -42,7 +42,7 @@
 
 [ ] 3.5. Desarrollar un sistema de notificaciones en tiempo real para el estado de las tareas
 
-[ ] 3.6. Crear la vista de visualización de historias e imágenes generadas
+[x] 3.6. Crear la vista de visualización de historias e imágenes generadas
 
 [ ] 3.7. Implementar la funcionalidad de exportación de historias
 
