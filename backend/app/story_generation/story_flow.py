@@ -159,7 +159,7 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
             image_description=chapter_content.image_description,
             image_url=image_url,
         )
-    ], "current_chapter": current_chapter + 1}
+    ]}
 
 
 # Configuración del grafo
