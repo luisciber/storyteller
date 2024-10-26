@@ -7,8 +7,10 @@
 	import * as Card from '$lib/components/ui/card';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
+	import { Loader2 } from 'lucide-svelte';
 
 	let stories: Story[] = [];
+	let loading = true;
 
 	onMount(async () => {
 		try {
@@ -17,6 +19,8 @@
 		} catch (error) {
 			console.error('Error al obtener las historias:', error);
 			toast.error('Error al obtener las historias');
+		} finally {
+			loading = false;
 		}
 	});
 
@@ -38,26 +42,32 @@
 		</div>
 	</div>
 
-	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each stories as story}
-			<Card.Root class="flex flex-col">
-				<Card.Header>
-					<Card.Title class="text-paper">{story.title}</Card.Title>
-					<Card.Description class="flex gap-2">
-						<p>Género: {story.preferences.genre}</p>
-					</Card.Description>
-				</Card.Header>
-				<Card.Content class="flex h-full flex-col gap-4">
-					<AspectRatio ratio={16 / 9} class="bg-muted">
-						<img src={story.image_url} alt={story.title} class="rounded-lg" />
-					</AspectRatio>
+	{#if loading}
+		<div class="flex justify-center items-center h-64">
+			<Loader2 class="h-16 w-16 animate-spin text-primary" />
+		</div>
+	{:else}
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{#each stories as story}
+				<Card.Root class="flex flex-col">
+					<Card.Header>
+						<Card.Title class="text-paper">{story.title}</Card.Title>
+						<Card.Description class="flex gap-2">
+							<p>Género: {story.preferences.genre}</p>
+						</Card.Description>
+					</Card.Header>
+					<Card.Content class="flex h-full flex-col gap-4">
+						<AspectRatio ratio={16 / 9} class="bg-muted">
+							<img src={story.image_url} alt={story.title} class="rounded-lg" />
+						</AspectRatio>
 
-					<p class="text-paper h-full">{story.premise}</p>
-				</Card.Content>
-				<Card.Footer class="flex justify-end">
-					<Button on:click={() => navigateToStory(story.id!)}>Ver Historia</Button>
-				</Card.Footer>
-			</Card.Root>
-		{/each}
-	</div>
+						<p class="text-paper h-full">{story.premise}</p>
+					</Card.Content>
+					<Card.Footer class="flex justify-end">
+						<Button on:click={() => navigateToStory(story.id!)}>Ver Historia</Button>
+					</Card.Footer>
+				</Card.Root>
+			{/each}
+		</div>
+	{/if}
 </main>

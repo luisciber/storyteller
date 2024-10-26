@@ -15,6 +15,9 @@ importers:
       '@hey-api/openapi-ts':
         specifier: ^0.53.12
         version: 0.53.12(typescript@5.6.3)
+      '@iconify/svelte':
+        specifier: ^4.0.2
+        version: 4.0.2(svelte@5.1.2)
       '@playwright/test':
         specifier: ^1.45.3
         version: 1.48.1
@@ -357,6 +360,14 @@ packages:
   '@humanwhocodes/retry@0.3.1':
     resolution: {integrity: sha512-JBxkERygn7Bv/GbN5Rv8Ul6LVknS+5Bp6RgDC/O8gEBU/yeH5Ui5C/OlWrTb6qct7LjjfT6Re2NxB0ln0yYybA==}
     engines: {node: '>=18.18'}
+
+  '@iconify/svelte@4.0.2':
+    resolution: {integrity: sha512-6BSrU85FzGfhQD3bTXpnkCCvBAglEt8T9QednVnXAYm4C+d3464y+pYMzhQNJm5mPId2cuiw+2wXlDflXllHDw==}
+    peerDependencies:
+      svelte: '>4.0.0'
+
+  '@iconify/types@2.0.0':
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
 
   '@internationalized/date@3.5.6':
     resolution: {integrity: sha512-jLxQjefH9VI5P9UQuqB6qNKnvFt1Ky1TPIzHGsIlCi7sZZoMR8SdYbBGRvM0y+Jtb+ez4ieBzmiAUcpmPYpyOw==}
@@ -2229,6 +2240,13 @@ snapshots:
   '@humanwhocodes/module-importer@1.0.1': {}
 
   '@humanwhocodes/retry@0.3.1': {}
+
+  '@iconify/svelte@4.0.2(svelte@5.1.2)':
+    dependencies:
+      '@iconify/types': 2.0.0
+      svelte: 5.1.2
+
+  '@iconify/types@2.0.0': {}
 
   '@internationalized/date@3.5.6':
     dependencies:

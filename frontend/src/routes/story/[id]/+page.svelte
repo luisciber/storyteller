@@ -3,6 +3,7 @@
 	import { getStoryByIdApiStoriesStoryIdGet } from '$lib/api/services.gen';
 	import type { Story } from '$lib/api/types.gen';
 	import Modal from '$lib/components/ui/modal.svelte';
+	import { Loader2 } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import { fade, fly } from 'svelte/transition';
@@ -10,6 +11,7 @@
 	let story: Story | null = null;
 	let selectedImage: string | null = null;
 	let selectedAudio: string | null | undefined = null;
+	let loading = true;
 
 	onMount(async () => {
 		const storyId = $page.params.id;
@@ -23,6 +25,8 @@
 		} catch (error) {
 			console.error('Error al obtener la historia:', error);
 			toast.error('Error al cargar la historia');
+		} finally {
+			loading = false;
 		}
 	});
 
@@ -38,7 +42,11 @@
 </script>
 
 <main class="container mx-auto w-full max-w-5xl p-4">
-	{#if story}
+	{#if loading}
+		<div class="flex h-64 items-center justify-center">
+			<Loader2 class="text-primary h-16 w-16 animate-spin" />
+		</div>
+	{:else if story}
 		<div class="mb-8 flex w-full items-center justify-between">
 			<h1 class="text-paper mb-6 text-center text-4xl font-bold" in:fly={{ y: -20, duration: 500 }}>
 				{story.title}
@@ -84,7 +92,7 @@
 			</section>
 		{/each}
 	{:else}
-		<p>Cargando historia...</p>
+		<p class="text-paper text-center">No se pudo cargar la historia.</p>
 	{/if}
 </main>
 

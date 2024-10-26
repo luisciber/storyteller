@@ -7,6 +7,7 @@
 	import { Label } from '$lib/components/ui/label';
 	import Modal from '$lib/components/ui/modal.svelte';
 	import * as Select from '$lib/components/ui/select';
+	import Icon from '@iconify/svelte';
 	import type { Selected } from 'bits-ui';
 	import { toast } from 'svelte-sonner';
 
@@ -23,7 +24,17 @@
 		{ value: 'fantasy', label: 'Fantasía' },
 		{ value: 'scifi', label: 'Ciencia Ficción' },
 		{ value: 'romance', label: 'Romance' },
-		{ value: 'mystery', label: 'Misterio' }
+		{ value: 'mystery', label: 'Misterio' },
+		{ value: 'horror', label: 'Terror' },
+		{ value: 'thriller', label: 'Suspense' },
+		{ value: 'historical', label: 'Histórica' },
+		{ value: 'adventure', label: 'Aventura' },
+		{ value: 'comedy', label: 'Comedia' },
+		{ value: 'drama', label: 'Drama' },
+		{ value: 'dystopian', label: 'Distopía' },
+		{ value: 'crime', label: 'Policiaca' },
+		{ value: 'western', label: 'Western' },
+		{ value: 'literary', label: 'Ficción literaria' }
 	];
 
 	let selectedGenre: Selected<string>;
@@ -65,14 +76,20 @@
 	}
 </script>
 
-<main class="container mx-auto p-4">
-	<h1 class="mb-6 text-3xl font-bold">Generador de Historias</h1>
+<main class="container mx-auto h-full w-full max-w-2xl p-4">
+	<h1 class="mb-6 text-center text-3xl font-bold">
+		<Icon icon="mdi:book-open-page-variant" class="mr-2 inline-block" />
+		Generador de Historias
+	</h1>
 
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<div>
-			<Label for="genre">Género</Label>
+	<form on:submit|preventDefault={handleSubmit} class="space-y-6 rounded-lg bg-white p-6 shadow-md">
+		<div class="flex flex-col gap-2">
+			<Label for="genre" class="flex items-center">
+				<Icon icon="mdi:genre" class="mr-2" />
+				Género
+			</Label>
 			<Select.Root bind:selected={selectedGenre}>
-				<Select.Trigger>
+				<Select.Trigger class="w-full">
 					<Select.Value placeholder="Selecciona un género" />
 				</Select.Trigger>
 				<Select.Content>
@@ -83,10 +100,13 @@
 			</Select.Root>
 		</div>
 
-		<div>
-			<Label for="length">Longitud</Label>
+		<div class="flex flex-col gap-2">
+			<Label for="length" class="flex items-center">
+				<Icon icon="mdi:ruler" class="mr-2" />
+				Longitud
+			</Label>
 			<Select.Root bind:selected={selectedLength}>
-				<Select.Trigger>
+				<Select.Trigger class="w-full">
 					<Select.Value placeholder="Selecciona la longitud" />
 				</Select.Trigger>
 				<Select.Content>
@@ -97,48 +117,63 @@
 			</Select.Root>
 		</div>
 
-		<div>
-			<Label for="style">Estilo de escritura</Label>
+		<div class="flex flex-col gap-2">
+			<Label for="style" class="flex items-center">
+				<Icon icon="mdi:pencil" class="mr-2" />
+				Estilo de escritura
+			</Label>
 			<Input
 				type="text"
 				id="style"
 				bind:value={userPreferences.style}
-				placeholder="Descriptivo, Conciso, Poético, etc."
+				placeholder="Descriptivo, Conciso, Poético, Humorístico, Narrativo, Periodístico, Académico, etc."
 			/>
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<Label for="themes_to_include">Temas a incluir (separados por comas)</Label>
+			<Label for="themes_to_include" class="flex items-center">
+				<Icon icon="mdi:plus-circle-outline" class="mr-2" />
+				Temas a incluir (separados por comas)
+			</Label>
 			<Input
 				type="text"
 				id="themes_to_include"
 				bind:value={themesToInclude}
-				placeholder="Amor, Aventura, Misterio"
+				placeholder="Amor, Aventura, Misterio, etc."
 			/>
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<Label for="themes_to_avoid">Temas a evitar (separados por comas)</Label>
+			<Label for="themes_to_avoid" class="flex items-center">
+				<Icon icon="mdi:minus-circle-outline" class="mr-2" />
+				Temas a evitar (separados por comas)
+			</Label>
 			<Input
 				type="text"
 				id="themes_to_avoid"
 				bind:value={themesToAvoid}
-				placeholder="Violencia, Guerra, Política"
+				placeholder="Violencia, Guerra, Política, etc."
 			/>
 		</div>
 
 		<div class="flex flex-col gap-2">
-			<Label for="art_style">Estilo artístico para las imágenes</Label>
+			<Label for="art_style" class="flex items-center">
+				<Icon icon="mdi:palette" class="mr-2" />
+				Estilo artístico para las imágenes
+			</Label>
 			<Input
 				type="text"
 				id="art_style"
 				bind:value={userPreferences.art_style}
-				placeholder="Realista, Cartoon, Acuarela, etc."
+				placeholder="Futurista, Realista, Cartoon, Acuarela, etc."
 			/>
 		</div>
 
 		<div class="flex justify-end">
-			<Button type="submit" disabled={isLoading}>Generar Historia</Button>
+			<Button type="submit" disabled={isLoading} class="w-full sm:w-auto">
+				<Icon icon="mdi:magic-wand" class="mr-2" />
+				Generar Historia
+			</Button>
 		</div>
 	</form>
 </main>
