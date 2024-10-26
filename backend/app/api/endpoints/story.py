@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.db.story_crud import (create_story, delete_story, get_stories,
                                get_story)
-from app.models.story import Chapter, Story
+from app.models.story import Story
 from app.story_generation.story_flow import UserPreferences, generate_story
 
 router = APIRouter()
@@ -17,13 +17,7 @@ async def create_story_endpoint(
         # Usando el primer título de capítulo como título de la historia
         title=story_data['outline'].chapter_titles[0],
         premise=story_data['outline'].premise,
-        chapters=[
-            Chapter(
-                title=chapter.title,
-                content=chapter.content,
-                image_description=chapter.image_description,
-            ) for chapter in story_data['chapters']
-        ]
+        chapters=story_data['chapters']
     )
     return await create_story(story)
 

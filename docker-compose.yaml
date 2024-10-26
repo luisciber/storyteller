@@ -19,6 +19,15 @@ services:
       - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
+  bucket:
+    image: oittaa/gcp-storage-emulator
+    command: start --default-bucket=storyteller
+    environment:
+      PORT: 9023
+    ports:
+      - "9023:9023"
+    volumes:
+      - ./storage:/storage
 
 volumes:
   mongodb-data:

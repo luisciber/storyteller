@@ -1,7 +1,10 @@
 import functools
+import uuid
 from operator import add
 from typing import Annotated, Optional
 
+import replicate
+import replicate.helpers
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
@@ -10,6 +13,7 @@ from typing_extensions import TypedDict
 
 from app.core.config import settings
 from app.prompts import CHAPTER_DEVELOPMENT_PROMPT, STORY_OUTLINE_PROMPT
+from app.services.bucket_service import BucketService
 
 
 # Modelos Pydantic para la estructura de datos
@@ -31,7 +35,11 @@ class ChapterContent(BaseModel):
 
 
 class Chapter(ChapterContent):
-    title: str
+    id: int = Field(description="El ID del capítulo")
+    title: str = Field(description="El título del capítulo")
+    image_url: Optional[str] = Field(
+        description="La URL de la imagen del capítulo"
+    )
 
 
 class ImageDescription(BaseModel):
@@ -60,6 +68,32 @@ openai_llm = ChatOpenAI(
     model="gpt-4o", api_key=settings.openai_api_key
 )
 
+
+bucket_service = BucketService()
+
+
+async def generate_image(prompt: str) -> str:
+    response: list[replicate.helpers.FileOutput] = replicate.run(
+        "black-forest-labs/flux-schnell",
+        input={
+            "prompt": prompt,
+            "go_fast": True,
+            "megapixels": "1",
+            "num_outputs": 1,
+            "aspect_ratio": "1:1",
+            "output_format": "webp",
+            "output_quality": 80,
+            "num_inference_steps": 4
+        }
+    )
+
+    file = response[0]
+    data = file.read()
+    path = f"images/{uuid.uuid4()}.webp"
+    url = await bucket_service.upload_file(data, path)
+
+    return url
+
 # Estado del grafo
 
 
@@ -72,10 +106,10 @@ class GraphState(TypedDict):
 # Nodos del grafo
 
 
-def generate_outline(state: GraphState) -> GraphState:
+async def generate_outline(state: GraphState) -> GraphState:
     prompt = ChatPromptTemplate.from_template(STORY_OUTLINE_PROMPT)
     chain = prompt | openai_llm.with_structured_output(StoryOutline)
-    outline = chain.invoke(state['user_preferences'].model_dump())
+    outline = await chain.ainvoke(state['user_preferences'].model_dump())
     return {"outline": outline}
 
 
@@ -103,19 +137,28 @@ async def develop_chapters(state: GraphState) -> GraphState:
     return result
 
 
-def develop_chapter(state: GraphState, current_chapter: int) -> GraphState:
+async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState:
     prompt = ChatPromptTemplate.from_template(CHAPTER_DEVELOPMENT_PROMPT)
     chain = prompt | openai_llm.with_structured_output(ChapterContent)
-    chapter_content = chain.invoke({
+
+    # Generate chapter content
+    chapter_content = await chain.ainvoke({
         "chapter_title": state['outline'].chapter_titles[current_chapter],
         "premise": state['outline'].premise,
         "user_preferences": state['user_preferences'].model_dump()
     })
+
+    # Generate image
+    image_url = await generate_image(chapter_content.image_description)
+    print(image_url)
+
     return {"chapters": [
         Chapter(
+            id=current_chapter,
             title=state['outline'].chapter_titles[current_chapter],
             content=chapter_content.content,
-            image_description=chapter_content.image_description
+            image_description=chapter_content.image_description,
+            image_url='',
         )
     ], "current_chapter": current_chapter + 1}
 
@@ -144,5 +187,8 @@ async def generate_story(user_preferences: UserPreferences) -> GraphState:
         "current_chapter": 0,
         "chapters": []
     }
-    final_state = await story_generation_app.ainvoke(initial_state)
+    final_state: GraphState = await story_generation_app.ainvoke(initial_state)
+    final_state['chapters'] = sorted(
+        final_state['chapters'], key=lambda x: x.id
+    )
     return final_state
