@@ -10,7 +10,10 @@ export const ChapterSchema = {
         image_description: {
             type: 'string',
             title: 'Image Description',
-            description: 'Descripción detallada para la generación de una imagen clave del capítulo'
+            description: `
+Descripción detallada para la generación de una imagen clave del capítulo, 
+la descripción debe ser en inglés y debe ser lo más detallada posible
+        `
         },
         id: {
             type: 'integer',
@@ -93,6 +96,10 @@ export const StorySchema = {
             type: 'string',
             title: 'Title'
         },
+        image_url: {
+            type: 'string',
+            title: 'Image Url'
+        },
         premise: {
             type: 'string',
             title: 'Premise'
@@ -103,10 +110,13 @@ export const StorySchema = {
             },
             type: 'array',
             title: 'Chapters'
+        },
+        preferences: {
+            '$ref': '#/components/schemas/UserPreferences'
         }
     },
     type: 'object',
-    required: ['title', 'premise', 'chapters'],
+    required: ['title', 'image_url', 'premise', 'chapters', 'preferences'],
     title: 'Story'
 } as const;
 

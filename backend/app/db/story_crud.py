@@ -18,8 +18,10 @@ async def create_story(story: Story):
 
 async def get_stories():
     stories = []
-    async for story in story_collection.find():
-        stories.append(Story(**{**story, "id": str(story["_id"])}))
+    async for story in story_collection.find({}, {"chapters": 0}):
+        stories.append(
+            Story(**{**story, "id": str(story["_id"]), "chapters": []})
+        )
     return stories
 
 

@@ -5,14 +5,16 @@ from typing import Annotated, Optional
 
 import replicate
 import replicate.helpers
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
 from typing_extensions import TypedDict
 
 from app.core.config import settings
-from app.prompts import CHAPTER_DEVELOPMENT_PROMPT, STORY_OUTLINE_PROMPT
+from app.prompts import (CHAPTER_DEVELOPMENT_PROMPT, MAIN_IMAGE_PROMPT,
+                         STORY_OUTLINE_PROMPT)
 from app.services.bucket_service import BucketService
 
 
@@ -25,12 +27,16 @@ class StoryOutline(BaseModel):
     chapter_titles: list[str] = Field(
         description="Lista de títulos para cada capítulo de la historia"
     )
+    title: str = Field(description="El título de la historia")
 
 
 class ChapterContent(BaseModel):
     content: str = Field(description="El contenido detallado del capítulo")
     image_description: str = Field(
-        description="Descripción detallada para la generación de una imagen clave del capítulo"
+        description="""
+Descripción detallada para la generación de una imagen clave del capítulo, 
+la descripción debe ser en inglés y debe ser lo más detallada posible
+        """
     )
 
 
@@ -41,13 +47,9 @@ class Chapter(ChapterContent):
         description="La URL de la imagen del capítulo"
     )
 
-
-class ImageDescription(BaseModel):
-    prompt: str
-    style_guidance: str
+# Preferencias del usuario
 
 
-# Nuevo modelo para las preferencias del usuario
 class UserPreferences(BaseModel):
     genre: str = Field(description="El género literario de la historia")
     length: str = Field(
@@ -80,7 +82,7 @@ async def generate_image(prompt: str) -> str:
             "go_fast": True,
             "megapixels": "1",
             "num_outputs": 1,
-            "aspect_ratio": "1:1",
+            "aspect_ratio": "16:9",
             "output_format": "webp",
             "output_quality": 80,
             "num_inference_steps": 4
@@ -100,6 +102,7 @@ async def generate_image(prompt: str) -> str:
 class GraphState(TypedDict):
     user_preferences: UserPreferences
     outline: Optional[StoryOutline]
+    main_image_url: Optional[str]
     chapters: Annotated[list[Chapter], add]
 
 
@@ -109,8 +112,17 @@ class GraphState(TypedDict):
 async def generate_outline(state: GraphState) -> GraphState:
     prompt = ChatPromptTemplate.from_template(STORY_OUTLINE_PROMPT)
     chain = prompt | openai_llm.with_structured_output(StoryOutline)
-    outline = await chain.ainvoke(state['user_preferences'].model_dump())
-    return {"outline": outline}
+    outline: StoryOutline = await chain.ainvoke(
+        state['user_preferences'].model_dump()
+    )
+    main_image_prompt = ChatPromptTemplate.from_template(MAIN_IMAGE_PROMPT)
+    main_image_chain = main_image_prompt | openai_llm | StrOutputParser()
+    main_image_description = await main_image_chain.ainvoke({
+        "title": outline.title,
+        "premise": outline.premise
+    })
+    main_image_url = await generate_image(main_image_description)
+    return {"outline": outline, "main_image_url": main_image_url}
 
 
 async def develop_chapters(state: GraphState) -> GraphState:
@@ -142,7 +154,8 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
     chain = prompt | openai_llm.with_structured_output(ChapterContent)
 
     # Generate chapter content
-    chapter_content = await chain.ainvoke({
+    chapter_content: ChapterContent = await chain.ainvoke({
+        "title": state['outline'].title,
         "chapter_title": state['outline'].chapter_titles[current_chapter],
         "premise": state['outline'].premise,
         "user_preferences": state['user_preferences'].model_dump()

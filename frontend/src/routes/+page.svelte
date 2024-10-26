@@ -1,133 +1,64 @@
 <script lang="ts">
-	import { createStoryEndpointApiStoriesPost } from '$lib/api/services.gen';
-	import type { UserPreferences } from '$lib/api/types.gen';
+	import { goto } from '$app/navigation';
+	import { listStoriesApiStoriesGet } from '$lib/api/services.gen';
+	import type { Story } from '$lib/api/types.gen';
+	import { AspectRatio } from '$lib/components/ui/aspect-ratio';
 	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
-	import * as Select from '$lib/components/ui/select';
-	import type { Selected } from 'bits-ui';
+	import * as Card from '$lib/components/ui/card';
+	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
-	let userPreferences: UserPreferences = {
-		genre: '',
-		length: '',
-		style: '',
-		themes_to_include: [],
-		themes_to_avoid: [],
-		art_style: ''
-	};
+	let stories: Story[] = [];
 
-	const genres: Selected<string>[] = [
-		{ value: 'fantasy', label: 'Fantasía' },
-		{ value: 'scifi', label: 'Ciencia Ficción' },
-		{ value: 'romance', label: 'Romance' },
-		{ value: 'mystery', label: 'Misterio' }
-	];
-
-	let selectedGenre: Selected<string>;
-
-	const lengths: Selected<string>[] = [
-		{ value: 'short', label: 'Corta' },
-		{ value: 'medium', label: 'Media' },
-		{ value: 'long', label: 'Larga' }
-	];
-
-	let selectedLength: Selected<string>;
-
-	let themesToInclude = '';
-	let themesToAvoid = '';
-
-	async function handleSubmit() {
-		userPreferences.genre = selectedGenre.value;
-		userPreferences.length = selectedLength.value;
-		userPreferences.themes_to_include = themesToInclude.split(',').map((theme) => theme.trim());
-		userPreferences.themes_to_avoid = themesToAvoid.split(',').map((theme) => theme.trim());
-
+	onMount(async () => {
 		try {
-			const response = await createStoryEndpointApiStoriesPost({ body: userPreferences });
-			console.log('Historia creada:', response.data);
-			toast.success('Historia creada correctamente');
+			const response = await listStoriesApiStoriesGet();
+			stories = response.data ?? [];
 		} catch (error) {
-			console.error('Error al crear la historia:', error);
-			toast.error('Error al crear la historia');
+			console.error('Error al obtener las historias:', error);
+			toast.error('Error al obtener las historias');
 		}
+	});
+
+	function navigateToCreateStory() {
+		goto('/create-story');
 	}
 </script>
 
 <main class="container mx-auto p-4">
-	<h1 class="mb-6 text-3xl font-bold">Generador de Historias</h1>
+	<div class="flex items-center justify-between">
+		<h1 class="mb-6 text-3xl font-bold">StoryTeller</h1>
 
-	<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-		<div>
-			<Label for="genre">Género</Label>
-			<Select.Root bind:selected={selectedGenre}>
-				<Select.Trigger>
-					<Select.Value placeholder="Selecciona un género" />
-				</Select.Trigger>
-				<Select.Content>
-					{#each genres as genre}
-						<Select.Item value={genre.value}>{genre.label}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
+		<div class="mb-4">
+			<Button on:click={navigateToCreateStory}>Generar Nueva Historia</Button>
 		</div>
+	</div>
 
-		<div>
-			<Label for="length">Longitud</Label>
-			<Select.Root bind:selected={selectedLength}>
-				<Select.Trigger>
-					<Select.Value placeholder="Selecciona la longitud" />
-				</Select.Trigger>
-				<Select.Content>
-					{#each lengths as length}
-						<Select.Item value={length.value}>{length.label}</Select.Item>
-					{/each}
-				</Select.Content>
-			</Select.Root>
-		</div>
+	<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+		{#each stories as story}
+			<!-- <div class="rounded-lg border p-4 shadow">
+				<h2 class="mb-2 text-xl font-semibold">{story.title}</h2>
+				<p class="mb-2 text-gray-600">Género: {story.preferences.genre}</p>
+				<p class="mb-2 text-gray-600">Longitud: {story.preferences.length}</p>
+			</div> -->
+			<Card.Root class="flex flex-col">
+				<Card.Header>
+					<Card.Title>{story.title}</Card.Title>
+					<Card.Description class="flex gap-2">
+						<p>Género: {story.preferences.genre}</p>
+					</Card.Description>
+				</Card.Header>
+				<Card.Content class="flex h-full flex-col gap-4">
+					<AspectRatio ratio={16 / 9} class="bg-muted">
+						<img src={story.image_url} alt={story.title} class="rounded-lg" />
+					</AspectRatio>
 
-		<div>
-			<Label for="style">Estilo de escritura</Label>
-			<Input
-				type="text"
-				id="style"
-				bind:value={userPreferences.style}
-				placeholder="Descriptivo, Conciso, Poético, etc."
-			/>
-		</div>
-
-		<div class="flex flex-col gap-2">
-			<Label for="themes_to_include">Temas a incluir (separados por comas)</Label>
-			<Input
-				type="text"
-				id="themes_to_include"
-				bind:value={themesToInclude}
-				placeholder="Amor, Aventura, Misterio"
-			/>
-		</div>
-
-		<div class="flex flex-col gap-2">
-			<Label for="themes_to_avoid">Temas a evitar (separados por comas)</Label>
-			<Input
-				type="text"
-				id="themes_to_avoid"
-				bind:value={themesToAvoid}
-				placeholder="Violencia, Guerra, Política"
-			/>
-		</div>
-
-		<div class="flex flex-col gap-2">
-			<Label for="art_style">Estilo artístico para las imágenes</Label>
-			<Input
-				type="text"
-				id="art_style"
-				bind:value={userPreferences.art_style}
-				placeholder="Realista, Cartoon, Acuarela, etc."
-			/>
-		</div>
-
-		<div class="flex justify-end">
-			<Button type="submit">Generar Historia</Button>
-		</div>
-	</form>
+					<p class="h-full">{story.premise}</p>
+				</Card.Content>
+				<Card.Footer class="flex justify-end">
+					<Button>Ver Historia</Button>
+				</Card.Footer>
+			</Card.Root>
+		{/each}
+	</div>
 </main>

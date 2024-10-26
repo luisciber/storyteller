@@ -6,7 +6,10 @@ export type Chapter = {
      */
     content: string;
     /**
-     * Descripción detallada para la generación de una imagen clave del capítulo
+     *
+     * Descripción detallada para la generación de una imagen clave del capítulo,
+     * la descripción debe ser en inglés y debe ser lo más detallada posible
+     *
      */
     image_description: string;
     /**
@@ -36,8 +39,10 @@ export type Story = {
     created_at?: string;
     updated_at?: string;
     title: string;
+    image_url: string;
     premise: string;
     chapters: Array<Chapter>;
+    preferences: UserPreferences;
 };
 
 export type UserPreferences = {

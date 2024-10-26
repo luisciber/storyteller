@@ -14,10 +14,11 @@ async def create_story_endpoint(
 ):
     story_data = await generate_story(user_preferences)
     story = Story(
-        # Usando el primer título de capítulo como título de la historia
-        title=story_data['outline'].chapter_titles[0],
+        title=story_data['outline'].title,
+        image_url=story_data['main_image_url'],
         premise=story_data['outline'].premise,
-        chapters=story_data['chapters']
+        chapters=story_data['chapters'],
+        preferences=user_preferences
     )
     return await create_story(story)
 

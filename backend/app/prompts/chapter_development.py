@@ -1,6 +1,7 @@
 CHAPTER_DEVELOPMENT_PROMPT = """
 Desarrolla el siguiente capítulo de la historia basándote en la información proporcionada:
 
+Título de la historia: {title}
 Título del capítulo: {chapter_title}
 Premisa de la historia: {premise}
 Preferencias del usuario: {user_preferences}
