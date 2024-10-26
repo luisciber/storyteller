@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { createStoryEndpointApiStoriesPost } from '$lib/api/services.gen';
 	import type { UserPreferences } from '$lib/api/types.gen';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
+	import Modal from '$lib/components/ui/modal.svelte';
 	import * as Select from '$lib/components/ui/select';
 	import type { Selected } from 'bits-ui';
 	import { toast } from 'svelte-sonner';
@@ -37,19 +39,28 @@
 	let themesToInclude = '';
 	let themesToAvoid = '';
 
+	let isLoading = false;
+
+	function navigateToRoot() {
+		goto(`/`);
+	}
+
 	async function handleSubmit() {
-		userPreferences.genre = selectedGenre.label!;
-		userPreferences.length = selectedLength.label!;
+		isLoading = true;
+		userPreferences.genre = selectedGenre?.label ?? '';
+		userPreferences.length = selectedLength?.label ?? '';
 		userPreferences.themes_to_include = themesToInclude.split(',').map((theme) => theme.trim());
 		userPreferences.themes_to_avoid = themesToAvoid.split(',').map((theme) => theme.trim());
 
 		try {
-			const response = await createStoryEndpointApiStoriesPost({ body: userPreferences });
-			console.log('Historia creada:', response.data);
+			await createStoryEndpointApiStoriesPost({ body: userPreferences });
 			toast.success('Historia creada correctamente');
+			navigateToRoot();
 		} catch (error) {
 			console.error('Error al crear la historia:', error);
 			toast.error('Error al crear la historia');
+		} finally {
+			isLoading = false;
 		}
 	}
 </script>
@@ -127,7 +138,17 @@
 		</div>
 
 		<div class="flex justify-end">
-			<Button type="submit">Generar Historia</Button>
+			<Button type="submit" disabled={isLoading}>Generar Historia</Button>
 		</div>
 	</form>
 </main>
+
+<Modal isOpen={isLoading}>
+	<div class="flex flex-col items-center justify-center p-4">
+		<div
+			class="border-primary mb-4 h-12 w-12 animate-spin rounded-full border-4 border-t-4 border-t-transparent"
+		></div>
+		<p class="text-lg font-semibold">Generando tu historia...</p>
+		<p class="mt-2 text-sm text-gray-500">Por favor, espera un momento.</p>
+	</div>
+</Modal>

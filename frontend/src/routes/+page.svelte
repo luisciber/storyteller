@@ -31,7 +31,7 @@
 
 <main class="container mx-auto p-4">
 	<div class="flex items-center justify-between">
-		<h1 class="mb-6 text-3xl font-bold">StoryTeller</h1>
+		<h1 class="text-paper mb-6 text-3xl font-bold">StoryTeller</h1>
 
 		<div class="mb-4">
 			<Button on:click={navigateToCreateStory}>Generar Nueva Historia</Button>
@@ -42,7 +42,7 @@
 		{#each stories as story}
 			<Card.Root class="flex flex-col">
 				<Card.Header>
-					<Card.Title>{story.title}</Card.Title>
+					<Card.Title class="text-paper">{story.title}</Card.Title>
 					<Card.Description class="flex gap-2">
 						<p>Género: {story.preferences.genre}</p>
 					</Card.Description>
@@ -52,7 +52,7 @@
 						<img src={story.image_url} alt={story.title} class="rounded-lg" />
 					</AspectRatio>
 
-					<p class="h-full">{story.premise}</p>
+					<p class="text-paper h-full">{story.premise}</p>
 				</Card.Content>
 				<Card.Footer class="flex justify-end">
 					<Button on:click={() => navigateToStory(story.id!)}>Ver Historia</Button>
