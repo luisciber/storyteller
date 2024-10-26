@@ -36,9 +36,9 @@
 
 [ ] 3.2. Diseñar e implementar la interfaz de usuario principal
 
-[ ] 3.3. Crear componentes para la entrada de preferencias del usuario
+[x] 3.3. Crear componentes para la entrada de preferencias del usuario
 
-[ ] 3.4. Implementar la lógica de comunicación con el backend
+[x] 3.4. Implementar la lógica de comunicación con el backend
 
 [ ] 3.5. Desarrollar un sistema de notificaciones en tiempo real para el estado de las tareas
 
