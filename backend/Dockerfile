@@ -4,6 +4,10 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app/
 
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install uv
 # Ref: https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
 COPY --from=ghcr.io/astral-sh/uv:0.4.15 /uv /bin/uv

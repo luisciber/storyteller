@@ -28,27 +28,27 @@ services:
       - "9023:9023"
     volumes:
       - ./storage:/storage
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    env_file:
-      - .env
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongodb
-      - redis
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    environment:
-      - PUBLIC_API_URL=http://backend:8000
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - mongodb
+  #     - redis
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - PUBLIC_API_URL=http://localhost:8000
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - backend
 
 volumes:
   mongodb-data:

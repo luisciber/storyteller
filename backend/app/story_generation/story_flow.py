@@ -1,10 +1,8 @@
+import asyncio
 import functools
-import uuid
 from operator import add
 from typing import Annotated, Optional
 
-import replicate
-import replicate.helpers
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
@@ -15,7 +13,8 @@ from typing_extensions import TypedDict
 from app.core.config import settings
 from app.prompts import (CHAPTER_DEVELOPMENT_PROMPT, MAIN_IMAGE_PROMPT,
                          STORY_OUTLINE_PROMPT)
-from app.services.bucket_service import BucketService
+from app.story_generation.audio_generation import generate_audio
+from app.story_generation.image_generation import generate_image
 
 
 # Modelos Pydantic para la estructura de datos
@@ -44,7 +43,12 @@ class Chapter(ChapterContent):
     id: int = Field(description="El ID del capítulo")
     title: str = Field(description="El título del capítulo")
     image_url: Optional[str] = Field(
-        description="La URL de la imagen del capítulo"
+        description="La URL de la imagen del capítulo",
+        default=None
+    )
+    audio_url: Optional[str] = Field(
+        description="La URL del audio del capítulo",
+        default=None
     )
 
 # Preferencias del usuario
@@ -70,32 +74,6 @@ openai_llm = ChatOpenAI(
     model="gpt-4o", api_key=settings.openai_api_key
 )
 
-
-bucket_service = BucketService()
-
-
-async def generate_image(prompt: str) -> str:
-    response: list[replicate.helpers.FileOutput] = replicate.run(
-        "black-forest-labs/flux-schnell",
-        input={
-            "prompt": prompt,
-            "go_fast": True,
-            "megapixels": "1",
-            "num_outputs": 1,
-            "aspect_ratio": "16:9",
-            "output_format": "webp",
-            "output_quality": 80,
-            "num_inference_steps": 4
-        }
-    )
-
-    file = response[0]
-    data = file.read()
-    path = f"images/{uuid.uuid4()}.webp"
-    url = await bucket_service.upload_file(data, path)
-
-    return url
-
 # Estado del grafo
 
 
@@ -115,14 +93,22 @@ async def generate_outline(state: GraphState) -> GraphState:
     outline: StoryOutline = await chain.ainvoke(
         state['user_preferences'].model_dump()
     )
+
+    return {"outline": outline}
+
+
+async def generate_main_image(state: GraphState) -> GraphState:
+    outline = state['outline']
     main_image_prompt = ChatPromptTemplate.from_template(MAIN_IMAGE_PROMPT)
     main_image_chain = main_image_prompt | openai_llm | StrOutputParser()
     main_image_description = await main_image_chain.ainvoke({
         "title": outline.title,
         "premise": outline.premise
     })
+
     main_image_url = await generate_image(main_image_description)
-    return {"outline": outline, "main_image_url": main_image_url}
+
+    return {"main_image_url": main_image_url}
 
 
 async def develop_chapters(state: GraphState) -> GraphState:
@@ -161,8 +147,15 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
         "user_preferences": state['user_preferences'].model_dump()
     })
 
-    # Generate image
-    image_url = await generate_image(chapter_content.image_description)
+    # Generate image and audio in parallel
+    image_task = asyncio.create_task(
+        generate_image(chapter_content.image_description)
+    )
+    audio_task = asyncio.create_task(
+        generate_audio(chapter_content.content)
+    )
+
+    image_url, audio_url = await asyncio.gather(image_task, audio_task)
 
     return {"chapters": [
         Chapter(
@@ -171,6 +164,7 @@ async def develop_chapter(state: GraphState, current_chapter: int) -> GraphState
             content=chapter_content.content,
             image_description=chapter_content.image_description,
             image_url=image_url,
+            audio_url=audio_url
         )
     ]}
 
@@ -180,11 +174,13 @@ workflow = StateGraph(GraphState)
 
 # Agregar nodos
 workflow.add_node("generate_outline", generate_outline)
+workflow.add_node("generate_main_image", generate_main_image)
 workflow.add_node("develop_chapters", develop_chapters)
 
 # Definir el flujo
 workflow.set_entry_point("generate_outline")
 workflow.add_edge("generate_outline", "develop_chapters")
+workflow.add_edge("generate_outline", "generate_main_image")
 
 # Compilar el grafo
 story_generation_app = workflow.compile()

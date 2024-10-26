@@ -18,7 +18,7 @@ async def create_story(story: Story):
 
 async def get_stories():
     stories = []
-    async for story in story_collection.find({}, {"chapters": 0}):
+    async for story in story_collection.find({}, {"chapters": 0}).sort("updated_at", -1):
         stories.append(
             Story(**{**story, "id": str(story["_id"]), "chapters": []})
         )

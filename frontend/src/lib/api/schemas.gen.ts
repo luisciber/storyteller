@@ -36,10 +36,22 @@ la descripción debe ser en inglés y debe ser lo más detallada posible
             ],
             title: 'Image Url',
             description: 'La URL de la imagen del capítulo'
+        },
+        audio_url: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Audio Url',
+            description: 'La URL del audio del capítulo'
         }
     },
     type: 'object',
-    required: ['content', 'image_description', 'id', 'title', 'image_url'],
+    required: ['content', 'image_description', 'id', 'title'],
     title: 'Chapter'
 } as const;
 

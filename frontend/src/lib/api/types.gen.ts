@@ -23,7 +23,11 @@ export type Chapter = {
     /**
      * La URL de la imagen del capítulo
      */
-    image_url: (string | null);
+    image_url?: (string | null);
+    /**
+     * La URL del audio del capítulo
+     */
+    audio_url?: (string | null);
 };
 
 export type HTTPValidationError = {

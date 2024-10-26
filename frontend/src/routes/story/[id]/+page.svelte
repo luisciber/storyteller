@@ -9,6 +9,7 @@
 
 	let story: Story | null = null;
 	let selectedImage: string | null = null;
+	let selectedAudio: string | null | undefined = null;
 
 	onMount(async () => {
 		const storyId = $page.params.id;
@@ -25,12 +26,14 @@
 		}
 	});
 
-	function openImage(imageUrl: string) {
+	function openImage(imageUrl: string, audioUrl: string | null | undefined) {
 		selectedImage = imageUrl;
+		selectedAudio = audioUrl;
 	}
 
 	function closeImage() {
 		selectedImage = null;
+		selectedAudio = null;
 	}
 </script>
 
@@ -43,7 +46,7 @@
 
 			<button
 				class="cursor-pointer border-none bg-transparent p-0"
-				on:click={() => openImage(story!.image_url)}
+				on:click={() => openImage(story!.image_url, null)}
 			>
 				<img
 					src={story.image_url}
@@ -57,19 +60,27 @@
 			<section class="mb-12" in:fade={{ duration: 300, delay: index * 100 }}>
 				<h2 class="text-paper mb-4 text-2xl font-semibold">{chapter.title}</h2>
 
-				<div class="clearfix">
-					<button
-						class="float-left mb-2 mr-4 cursor-pointer border-none bg-transparent p-0"
-						on:click={() => openImage(chapter.image_url!)}
-					>
-						<img
-							src={chapter.image_url}
-							alt={chapter.title}
-							class="max-w-[350px] rounded-lg object-cover transition-opacity hover:opacity-90"
-						/>
-					</button>
-					<p class="text-paper text-justify leading-relaxed">{chapter.content}</p>
-				</div>
+				{#if chapter.image_url}
+					<div class="clearfix">
+						<button
+							class="float-left mb-2 mr-4 cursor-pointer border-none bg-transparent p-0"
+							on:click={() => openImage(chapter.image_url!, chapter.audio_url)}
+						>
+							<div class="flex flex-col items-center gap-2">
+								<img
+									src={chapter.image_url}
+									alt={chapter.title}
+									class="max-w-[350px] rounded-lg object-cover transition-opacity hover:opacity-90"
+								/>
+								{#if chapter.audio_url}
+									<audio src={chapter.audio_url} controls></audio>
+								{/if}
+							</div>
+						</button>
+
+						<p class="text-paper text-justify leading-relaxed">{chapter.content}</p>
+					</div>
+				{/if}
 			</section>
 		{/each}
 	{:else}
@@ -78,5 +89,10 @@
 </main>
 
 <Modal on:close={closeImage} isOpen={selectedImage !== null}>
-	<img src={selectedImage} alt="Imagen ampliada" class="max-h-[90vh] max-w-full object-contain" />
+	<div class="flex flex-col items-center gap-4">
+		<img src={selectedImage} alt="Imagen ampliada" class="max-h-[90vh] max-w-full object-contain" />
+		{#if selectedAudio}
+			<audio src={selectedAudio} controls></audio>
+		{/if}
+	</div>
 </Modal>
