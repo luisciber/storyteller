@@ -30,8 +30,8 @@ class BucketService:
         file_obj = BytesIO(data)
         blob.upload_from_file(file_obj, content_type=content_type, rewind=True)
 
-        if not settings.development:
-            blob.make_public()
+        # if not settings.development:
+        #     blob.make_public()
 
         return blob.public_url
 
